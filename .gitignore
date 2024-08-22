@@ -11,3 +11,8 @@ pom.xml.asc
 /.prepl-port
 .hgignore
 .hg/
+
+/lib/
+.cpcache/
+.clj-kondo*
+.calva*
