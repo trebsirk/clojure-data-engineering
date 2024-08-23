@@ -1,10 +1,11 @@
 (ns models.person
-  (:require [clojure.java.io :as io]
+  (:require [clojure.data.csv :as csv]
+            [clojure.java.io :as io]
             [clojure.string :as str]))
 
 ;; (str/split "2,Alice," #"," -1)
 
-(defrecord Person [id ^String name age])
+(defrecord Person [id ^String name ^Integer age])
 
 ;; (->Person 1 "ty" nil)
 
@@ -50,7 +51,7 @@
   (with-open [reader (io/reader file-path)]
     (doall (map parse-person (line-seq reader)))))
 
-(read-persons-from-file "resources/people.txt")
+;; (read-persons-from-file "resources/people.txt")
 
 ;; parallel implementation
 (defn parse-line [line]
@@ -69,4 +70,32 @@
          (pmap parse-lines)
          (apply concat))))
 
-(read-persons-from-file-parallel "resources/people.txt" 4)
+;; (read-persons-from-file-parallel "resources/people-min.txt" 4)
+
+
+;; writing to csv 
+(defn person->csv-row [person]
+  [(get person :id)
+   (get person :name)
+   (str (get person :age))])
+
+(def persons [(->Person 1 "Alice" 30)
+              (->Person 2 "Bob" 25)])
+
+
+(defn write-persons-to-csv [filename persons]
+  (let [rows (cons ["id" "name" "age"]
+                   (map person->csv-row persons))]
+    (with-open [writer (io/writer filename)]
+      (csv/write-csv writer rows))))
+
+
+(defn -main [& args]
+  (let [persons [(->Person 1 "Alice" nil)
+                 (->Person 2 nil 25)
+                 (->Person 3 "Charlie" 40)]
+        filename "data/out/persons.csv"]
+    (write-persons-to-csv filename persons)
+    (println (str "Data written to " filename))))
+
+;; (-main)

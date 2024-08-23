@@ -1,9 +1,10 @@
 (ns etl.core
-  (:use [models.person])
+  (:use [models.person :refer [read-persons-from-file ->Person read-persons-from-file-parallel]])
   (:use [models.attr])
   (:use [models.person_attr])
-  (:gen-class)
-  (:require [clojure.set :refer [intersection union]]))
+  (:require [clojure.set :refer [intersection union]])
+  (:gen-class))
+
 ;; (:require [clojure.set :refer [intersection]])
 (def persons
   (let [file-path "resources/people.txt"  ;; Replace with the path to your file
@@ -41,8 +42,8 @@
    :attr-name (:name y-rec)})
 
 (def joined (join-person-and-person-attr-map person personattr))
-(println joined)
-(println attr)
+;; (println joined)
+;; (println attr)
 (join-person-attributed-with-person joined attr)
 
 (defn -main [& args]
@@ -58,98 +59,108 @@
   ;; (map #(println %) als) 
   (let [file-path "resources/people.txt"  ;; Replace with the path to your file
         persons (read-persons-from-file file-path)]
-    (println persons))
+    ;; (println persons)
+    )
 
   (let [file-path "resources/attributes.txt"  ;; Replace with the path to your file
         attrs (read-attr-from-file file-path)]
-    (println attrs)))
+    ;; (println attrs)
+    )
+  ;; (println people)
+  ;; (let [file-path "resources/people.txt"  ;; Replace with the path to your file
+  ;;       persons (read-persons-from-file file-path)]
+  ;;   (println (count persons)))
+  (let [file-path "resources/people.txt"  ;; Replace with the path to your file
+        persons (read-persons-from-file-parallel file-path 1000)]
+    (println (count persons)))
+  (shutdown-agents))
+;; (-main)
+
+;; (def p1 (->Person 0 "Albert" 20))
+;; (def p2 (->Person 0 "Albert" 21))
+;; (group-by :id [p1 p2])
+;; (= (type p1) models.person.Person)
 
 
-(def p1 (->Person 0 "Albert" 20))
-(def p2 (->Person 0 "Albert" 21))
-(group-by :id [p1 p2])
-(= (type p1) models.person.Person)
+;; (defn cart [colls]
+;;   (if (empty? colls)
+;;     '(())
+;;     (for [more (cart (rest colls))
+;;           x (first colls)]
+;;       (cons x more))))
+;; (cart [[1 2 3] [\a \b]])
+
+;; (def bees-per-colony 50000)
+;; (def honey-per-colony 80)
+;; (def honey-per-bee (/ honey-per-colony bees-per-colony))
+;; (def honey-price (/ 11.89 (/ 24 16)));; per gallon
+;; (def honey-per-mead 2.5)
+;; (def price-per-gallon (* honey-price honey-per-mead))
+;; (def honey-per-hive-per-year (/ (+ 100 25) 2))
+
+;; (def mead-per-year (/ honey-per-hive-per-year honey-per-mead))
+;; honey-per-hive-per-year
+;; price-per-gallon
+;; mead-per-year
+;; honey-price
+;; (def mead-sale-per-gallon 10)
+;; (def profit (* mead-per-year mead-sale-per-gallon))
+;; profit
 
 
-(defn cart [colls]
-  (if (empty? colls)
-    '(())
-    (for [more (cart (rest colls))
-          x (first colls)]
-      (cons x more))))
-(cart [[1 2 3] [\a \b]])
+;; (defn -map [f coll]
+;;   (reduce
+;;    (fn [acc v] (conj acc (f v)))
+;;    []
+;;    coll))
 
-(def bees-per-colony 50000)
-(def honey-per-colony 80)
-(def honey-per-bee (/ honey-per-colony bees-per-colony))
-(def honey-price (/ 11.89 (/ 24 16)));; per gallon
-(def honey-per-mead 2.5)
-(def price-per-gallon (* honey-price honey-per-mead))
-(def honey-per-hive-per-year (/ (+ 100 25) 2))
+;; (-map #(* % %) [1 2 3])
+;; (map #(* % %) [1 2 3])
+;; (-map inc [1 2 3])
 
-(def mead-per-year (/ honey-per-hive-per-year honey-per-mead))
-honey-per-hive-per-year
-price-per-gallon
-mead-per-year
-honey-price
-(def mead-sale-per-gallon 10)
-(def profit (* mead-per-year mead-sale-per-gallon))
-profit
+;; (defn -filter [f coll]
+;;   (reduce
+;;    (fn [acc v]
+;;      (if (f v)
+;;        (conj acc v)
+;;        acc))
+;;    []
+;;    coll))
 
+;; (apply list (-filter even? [1 2 3]))
+;; (filter even? [1 2 3])
 
-(defn -map [f coll]
-  (reduce
-   (fn [acc v] (conj acc (f v)))
-   []
-   coll))
+;; (->> (range 1 4)
+;;      (-map inc)
+;;      (-filter even?))
 
-(-map #(* % %) [1 2 3])
-(map #(* % %) [1 2 3])
-(-map inc [1 2 3])
+;; ; abstract away the job that is happening
+;; (defn -mapping [f]
+;;   (fn [xf]
+;;     (fn [acc v]
+;;       (xf acc (f v)))))
 
-(defn -filter [f coll]
-  (reduce 
-   (fn [acc v]
-      (if (f v)
-        (conj acc v)
-        acc))
-    []
-    coll))
+;; (defn -filtering [f]
+;;   (fn [xf]
+;;     (fn [acc v]
+;;       (if (f v)
+;;         (xf acc v)
+;;         acc))))
 
-(apply list (-filter even? [1 2 3]))
-(filter even? [1 2 3])
+;; (def rfn (comp
+;;           (-mapping inc)
+;;           (-filtering odd?)))
 
-(->> (range 1 4)
-     (-map inc)
-     (-filter even?))
+;; ; expects 42
+;; ((rfn +) 42 1)
+;; ; expects 45
+;; ((rfn +) 42 2)
 
-; abstract away the job that is happening
-(defn -mapping [f]
-  (fn [xf]
-    (fn [acc v]
-      (xf acc (f v)))))
+;; (reduce (rfn +)
+;;         0
+;;         [1 2 3])
 
-(defn -filtering [f]
-  (fn [xf]
-    (fn [acc v]
-      (if (f v)
-        (xf acc v)
-        acc))))
-
-(def rfn (comp
-          (-mapping inc)
-          (-filtering odd?)))
-
-; expects 42
-((rfn +) 42 1)
-; expects 45
-((rfn +) 42 2)
-
-(reduce (rfn +)
-        0
-        [1 2 3])
-
-(reduce (rfn conj)
-        []
-        [1 2 3 4 5])
+;; (reduce (rfn conj)
+;;         []
+;;         [1 2 3 4 5])
 
