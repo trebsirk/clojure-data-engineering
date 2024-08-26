@@ -4,7 +4,6 @@
   (:use [models.person_attr])
   (:require [clojure.set :refer [intersection union]])
   (:gen-class))
-
 ;; (:require [clojure.set :refer [intersection]])
 (def persons
   (let [file-path "resources/people.txt"  ;; Replace with the path to your file
@@ -72,7 +71,7 @@
   ;;   (println (count persons)))
   (let [file-path "resources/people.txt"  ;; Replace with the path to your file
         persons (read-persons-from-file-parallel file-path 1000)]
-    (println (count persons)))
+    (println (count persons) "records found in" file-path))
   (shutdown-agents))
 ;; (-main)
 
@@ -164,3 +163,72 @@
 ;;         []
 ;;         [1 2 3 4 5])
 
+
+;; (defn get-chars [s] (str/split s #""))
+
+;; (defn diff? [a b] #(if (= a b) 0 1))
+;; (def a "hello")
+;; (def b "holle")
+;; (get-chars a)
+;; (map diff? ["a" "b"] ["a" "c"])
+;; (interleave ["a" "b"] ["a" "c"])
+;; (map diff? (get-chars a) (get-chars b))
+;; (apply + (map diff? (get-chars a) (get-chars b)))
+;; (let [[c1 c2] (map get-chars [a b])
+;;       lens (map count [c1 c2])
+;;       diff? #(if (= %1 %2) 0 1)]
+;;   (map diff? c1 c2))
+;; (defn hamming-distance [s1 s2]
+;;   (let [[c1 c2] (map get-chars [s1 s2])
+;;         lens (map count [c1 c2])
+;;         diff? #(if (= %1 %2) 0 1)]
+;;     (if (apply = lens)
+;;       (apply + (map diff? c1 c2))
+;;       0)))
+;; (hamming-distance a b)
+
+;; (defn isogram? [s]
+;;   (->> (str/split s #"")
+;;        frequencies
+;;        vals
+;;        (every? #(<= % 1))))
+;; (seq (chars (char-array "abc")))
+;; (- (int \a) 97)
+;; (isogram? "helo")
+;; (remove #(= % \o) a)
+;; ((partial map alph-num-map) "a")
+
+;; (defn combs
+;;   "Generates all combinations of k elements from the given collection."
+;;   [k coll]
+;;   (cond
+;;     (zero? k) '(())
+;;     (> k (count coll)) '()
+;;     :else (let [first-elem (first coll)
+;;                 rest-elems (rest coll)]
+;;             (concat
+;;              (map #(cons first-elem %) (combs (dec k) rest-elems))
+;;              (combs k rest-elems)))))
+
+;; (defn partial-flatten [coll]
+;;   "Flattens the input collection by one level."
+;;   (mapcat identity coll))
+
+
+
+;; (def x (concat (map #(combs % '(1 2 3)) (range 4))))
+
+;; (partial-flatten x)
+;; (identity '((1) (2) (3)))
+;; (mapcat identity '((()) ((1) (2) (3))))
+
+
+;; (apply concat (map identity '((()) ((1) (2) (3)))))
+
+;; (concat '((()) ((1) (2) (3))))
+
+;; '((()) ((1) (2) (3)))
+
+;; (apply concat 
+;;  (map identity 
+;;       (map reverse [[3 2 1 0] [6 5 4] [9 8 7]])))

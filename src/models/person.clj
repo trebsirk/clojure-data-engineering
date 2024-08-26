@@ -7,7 +7,20 @@
 
 (defrecord Person [id ^String name ^Integer age])
 
-;; (->Person 1 "ty" nil)
+(defn get-field-names [record-type]
+  ;;(map keyword (:members (meta record-type)))) 
+  (map keyword (:members (meta record-type))))
+
+(defn get-field-names [record-type]
+  (map #(-> % .getName keyword)
+       (.getDeclaredFields record-type)))
+
+;; (keys Person)
+;; (meta Person)
+;; (.getDeclaredFields Person)
+;; (map keyword (:members (meta Person)))
+;; (get-field-names Person)
+;; ;; (->Person 1 "ty" nil)
 
 (defn valid-name? [name]
   (and (string? name) (not (empty? name))))
@@ -79,8 +92,8 @@
    (get person :name)
    (str (get person :age))])
 
-(def persons [(->Person 1 "Alice" 30)
-              (->Person 2 "Bob" 25)])
+;; (def persons [(->Person 1 "Alice" 30)
+;;               (->Person 2 "Bob" 25)])
 
 
 (defn write-persons-to-csv [filename persons]
