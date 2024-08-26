@@ -1,7 +1,8 @@
 (ns models.person
   (:require [clojure.data.csv :as csv]
             [clojure.java.io :as io]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [etl.validation :as vld]))
 
 ;; (str/split "2,Alice," #"," -1)
 
@@ -28,11 +29,6 @@
 (defn valid-age? [age]
   (and (integer? age) (pos? age)))
 
-(defn parse-int [s]
-  (try
-    (Integer/parseInt s)
-    (catch NumberFormatException e
-      nil)))
 
 (defn parse-name-valid-or-nil [name]
   (cond
@@ -57,7 +53,9 @@
   "Parses a line of text and returns a Person record."
   ;; (println line)
   (let [[id name age] (str/split line #"," -1)]
-    (create-person-with-nils id name (parse-int age))))
+    (create-person-with-nils id name (vld/parse-num age "int"))))
+
+(vld/parse-num "3" "int")
 
 (defn read-persons-from-file [file-path]
   "Reads a file and converts its contents to a list of Person records."
