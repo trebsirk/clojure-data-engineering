@@ -5,6 +5,28 @@
   (:require [clojure.set :refer [intersection union]])
   (:gen-class))
 ;; (:require [clojure.set :refer [intersection]])
+
+(defmacro log-and-eval
+  ([expr]
+   `(log-and-eval "INFO" ~expr))
+  ([log-level expr]
+   `(let [result# ~expr
+          timestamp# (java.time.LocalDateTime/now)]
+      (println (str "[" timestamp# "] " ~log-level " - Evaluating expression: " '~expr))
+      (println (str "[" timestamp# "] " ~log-level " - Result: " result#))
+      result#)))
+
+;; (log-and-eval "WARN" (+ 1 1))
+;; (log-and-eval (+ 1 1))
+;; (log-and-eval (+ 1 2 3))
+;; (log-and-eval "DEBUG" (* 2 3 4))
+
+
+;; `(+ ~(list 1 2 3))
+;; `(+ (list 1 2 3))
+;; `(+ ~@(list 1 2 3))
+;; (eval `(+ ~@(list 1 2 3)))
+
 (def persons
   (let [file-path "resources/people.txt"  ;; Replace with the path to your file
         persons (read-persons-from-file file-path)]
