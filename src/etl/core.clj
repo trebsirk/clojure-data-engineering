@@ -75,10 +75,6 @@
   (shutdown-agents))
 ;; (-main)
 
-;; (def p1 (->Person 0 "Albert" 20))
-;; (def p2 (->Person 0 "Albert" 21))
-;; (group-by :id [p1 p2])
-;; (= (type p1) models.person.Person)
 
 
 ;; (defn cart [colls]
